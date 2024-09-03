@@ -1,0 +1,75 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Auctions{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    <link href="{% static 'auctions/cards.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</head>
+<body class="bg-light text-dark">
+    <div class="wrapper">
+        <!-- Header Section -->
+        <header class="py-4 mb-4 border-bottom">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-2">
+                <div class="container">
+                    <a class="navbar-brand font-weight-bold" href="{% url 'auctions:index' %}">Subasta UGRCH</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:index' %}">Ejemplares</a>
+                            </li>
+                            {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Ejemplar</a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:category_list' %}">Categorias</a>
+                            </li>
+                        </ul>
+
+                        <!-- Login/Register Section -->
+                        <ul class="navbar-nav ml-auto">
+                            {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <span class="navbar-text text-muted">Signed in as <strong>{{ user.username }}</strong>.</span>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'auctions:logout' %}" class="btn btn-outline-dark ml-3">Cerrar sesión</a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a href="{% url 'auctions:login' %}" class="btn btn-dark">Sesión</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container content py-4">
+            {% block body %}
+            {% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-white border-top mt-4 py-3">
+            <div class="container text-center">
+                <span class="text-muted">© Subasta UGRCH.</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

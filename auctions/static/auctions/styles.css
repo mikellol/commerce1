@@ -1,0 +1,30 @@
+body {
+    padding: 10px;
+}
+.col-lg.table-header{
+    text-align: center;
+}
+/* Ensure that the body takes up at least the full height of the viewport */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Wrapper for the main content to push footer to the bottom */
+.wrapper {
+    min-height: 100vh; /* Full viewport height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content area that grows as needed */
+.content {
+    flex: 1; /* Takes up the remaining space */
+}
+
+/* Footer styles */
+footer {
+    background-color: #f8f9fa; /* Light background color */
+    border-top: 1px solid #dee2e6; /* Border to separate from content */
+    padding: 1rem; /* Padding for spacing */
+}
