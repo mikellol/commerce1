@@ -8,6 +8,12 @@ import logging
 from django.db import models
 from django.shortcuts import render, get_object_or_404, reverse 
 from .models import Item, Bid
+from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from .models import Item, ItemCategory
+import logging
+import os  # Make sure to import the os module
 
 from .models import User, Bid, Item, ItemComment, Watchlist, ItemCategory, AuctionHistory
 from .utils import utility
@@ -15,41 +21,25 @@ import json
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 
-logger = logging.getLogger('mylogger')
+logger = logging.getLogger(__name__)
 #Define forms based on models
 
 
 class ItemForm(forms.ModelForm):
     class Meta:
-        category_choices = [
-            ('Toro', 'Toro'),
-            ('Vaca', 'Vaca'),
-            ('Caballo', 'Caballo'),
-            ('Becerro','Becerro')
-        ]
         model = Item
-        fields = ['title', 'description', 'img_url', 'starting_bid', 'category']
+        fields = ['title', 'description', 'image', 'starting_bid']
         labels = {
             'title': 'Nombre',
             'description': 'Descripción',
-            'img_url': 'Imagen',
-            'starting_bid': 'Precio',
-            'category': 'Categoría'
+            'image': 'Imagen',
+            'starting_bid': 'Precio'
         }
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control',
-                                            'id': 'item_title',
-                                            'placeholder': 'Nombre'}),
-            'description': forms.TextInput(attrs={'class': 'form-control',
-                                            'id': 'item_description',
-                                            'placeholder': 'Raza'}),
-            'img_url': forms.TextInput(attrs={'class': 'form-control',
-                                            'id': 'item_img_url',
-                                            'placeholder': 'Imagen'}),
-            'starting_bid': forms.NumberInput(attrs={'class': 'form-control',
-                                            'id': 'item_starting_bid',
-                                            'placeholder': 'Precio inicial'}),   
-            'category': forms.Select(choices=category_choices)                                       
+        'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
+        'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description'}),
+        'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'item_img_url', 'placeholder': 'Image'}),
+        'starting_bid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Starting Bid'})
         }
 
 class Comment(models.Model):
@@ -121,6 +111,7 @@ def index(request):
     }
     
     return render(request, "auctions/index.html", context)
+    
 def login_view(request):
     if request.method == "POST":
 
@@ -140,11 +131,9 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("auctions:index"))
-
 
 def register(request):
     if request.method == "POST":
@@ -175,60 +164,99 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def add(request):
-    if request.method == 'GET':
-        logger.info("Get add")
+    if request.method == 'POST':
+        add_item_form = ItemForm(request.POST, request.FILES)
+        if add_item_form.is_valid():
+            item_title = add_item_form.cleaned_data['title']
+            item_desc = add_item_form.cleaned_data['description']
+            item_image = request.FILES.get('image')
+            item_str_bid = add_item_form.cleaned_data['starting_bid']
+            
+            # Create a new Item
+            new_item = Item(
+                user=request.user,
+                title=item_title,
+                description=item_desc,
+                starting_bid=item_str_bid
+            )
+            
+            # Save the Item instance
+            new_item.save()
+            logger.debug("Item saved with ID: %s", new_item.id)
+            
+            # Save the uploaded image
+            if item_image:
+                # Construct the image path
+                image_dir = f'imagenes_raza/{new_item.id}/'
+                image_path = os.path.join(image_dir, item_image.name)
+                logger.debug("Saving image to path: %s", image_path)
+                
+                # Save the image to the filesystem
+                try:
+                    # Ensure the directory exists
+                    if not os.path.exists(default_storage.path(image_dir)):
+                        os.makedirs(default_storage.path(image_dir))
+                    
+                    # Save the file to the constructed path
+                    with default_storage.open(image_path, 'wb+') as destination:
+                        for chunk in item_image.chunks():
+                            destination.write(chunk)
+                    logger.debug("Image saved successfully to %s", image_path)
+                except Exception as e:
+                    logger.error("Error saving image: %s", e)
+                
+                # Update the Item instance with the image path
+                new_item.image = image_path
+                new_item.save()
+                logger.debug("Item updated with image path")
+            else:
+                logger.warning("No image found in the request")
+            
+            return redirect('auctions:index')
+        else:
+            logger.error("Form is invalid: %s", add_item_form.errors)
+            return render(request, "auctions/add.html", {
+                "new_form": add_item_form,
+                "message": "Invalid Data"
+            })
+    else:
+        logger.debug("Received GET request")
         return render(request, "auctions/add.html", {
             "new_form": ItemForm()
         })
-    else:
-        add_item_form = ItemForm(request.POST)
-        if add_item_form.is_valid():
-            item_title = add_item_form['title'].value()
-            item_desc = add_item_form['description'].value()
-            item_img_url = add_item_form['img_url'].value()
-            item_str_bid = add_item_form['starting_bid'].value()
-            item_cat = add_item_form['category'].value()
-            
-            #Register a new Item to the db
-            new_item = Item(user=request.user, 
-                            title=item_title,
-                            description=item_desc,
-                            img_url=item_img_url,
-                            starting_bid=item_str_bid,
-                            category=item_cat)
-            if new_item != None:
-                new_item.save()
-                message = "Item successfully added to the db"
-
-                #If the item was added successfully, then create a category with that item after making
-                #sure it has not already been added.
-                # Category.objects.filter(item=new_item)
-                item_category = ItemCategory(name=item_cat, item=new_item)
-                item_category.save()
-
-            else:
-                message = "Failure while saving to the db"
-            return HttpResponseRedirect(reverse("auctions:index"))
-        else:
-            return render(request, "auctions/add.html", {
-            "new_form": ItemForm(),
-            "message": "Invalid Data"
-            })
-
+    
+@login_required
 def cards_view(request):
-    user = User.objects.filter(username=request.user.username).first()
-    # bid = Bid.objects.get(user=user)
-    item = Item.objects.filter(user=user)[1]
-    description = str(item.description)[0:40] + ".."
+    # Get the current user
+    user = get_object_or_404(User, username=request.user.username)
+    
+    # Get items associated with the user, handling cases where there might be no items
+    items = Item.objects.filter(user=user)
+    if not items:
+        # Handle the case where the user has no items
+        return render(request, "auctions/cards.html", {
+            "user": user,
+            "item": None,
+            "description": "No items available."
+        })
+    
+    # Get the first item or handle index error
+    item = items[0]  # You can change the logic to select a different item if needed
+    description = str(item.description)[:40] + ".."
+    
+    # Optionally, get the bid information if applicable
+    last_bid = Bid.objects.filter(item=item).order_by('-timestamp').first()  # Fetch the latest bid
+
+    # Render the template with the item and user information
     return render(request, "auctions/cards.html", {
-        "user":user,
-        "item":item,
-        "description": description
+        "user": user,
+        "item": item,
+        "description": description,
+        "last_bid": last_bid  # Pass last_bid if you want to display bid information
     })
 
-
 def listing_details_view(request, id=None):
-    # If an ID is provided, fetch the item by ID; otherwise, use the title from POST or GET
+    # Fetch the item by ID or title
     if id:
         item_ = get_object_or_404(Item, id=id)
     else:
@@ -252,7 +280,10 @@ def listing_details_view(request, id=None):
     
     # Determine the last bid for the item
     last_bid = search_bid.order_by('amount').last() if search_bid.exists() else None
-    
+
+    # Get the three most recent bids
+    recent_bids = Bid.objects.filter(items=item_).order_by('-created_at')[:3]
+
     # Render the template with the appropriate context
     return render(request, "auctions/listing_details.html", {
         "item": item_,
@@ -261,8 +292,8 @@ def listing_details_view(request, id=None):
         "last_bid": last_bid,
         "privilege": own_this_item,
         "message_bid": message_bid,
+        "recent_bids": recent_bids,  # Pass the recent bids to the template
     })
-
 
 @login_required
 def add_comment(request):
@@ -296,6 +327,7 @@ def watchlist_view(request):
     #     })
     # else:
     #     return render(request, "auctions/index.html")
+
 def delete_item_watchlist(request):
     current_user = User.objects.filter(username=request.user.username).get()
     if request.method == 'POST':
@@ -307,7 +339,6 @@ def delete_item_watchlist(request):
     return render(request, "auctions/watchlist.html",{
         "watchlist": watchlist
     })
-
 
 def category_list_redirect(request, category):
     _category = str(category)
@@ -333,7 +364,6 @@ def category_list_redirect(request, category):
         "items": _items,
         "items_bids": items_bids
     })
-
 
 def category_list(request):
     category_choices = [
@@ -392,13 +422,15 @@ def place_bid(request):
     
 @login_required
 def end_listing(request):
-    if request.method == 'POST':        
-        listing_title = str(request.POST.get("listing_title", False))
+    if request.method == 'POST':
+        item_id = request.POST.get("item_id")
         
+        if not item_id:
+            return HttpResponseNotFound("Item ID is required")
+
         try:
-            item_ = Item.objects.get(title=listing_title)
+            item_ = Item.objects.get(id=item_id)
         except Item.DoesNotExist:
-            # Redirigir o manejar el caso donde el ítem no se encuentra
             return HttpResponseNotFound("Item not found")
 
         placed_bids = Bid.objects.filter(items=item_).order_by('amount')
@@ -410,9 +442,8 @@ def end_listing(request):
             auction_history.save()
             logger.info(f"Auction history saved for item '{item_.title}' with winner '{best_bid_user.username}' and bid amount '{last_bid.amount}'")
         else:
-            # Manejar el caso en que no hay ofertas
             logger.info(f"No bids found for item '{item_.title}'. Auction ended without a winner.")
-            # Puedes decidir si quieres crear un registro en AuctionHistory para este caso o no
+            # Opcionalmente puedes registrar el historial de subastas para los casos sin oferta
 
         # Actualiza el estado del ítem para indicar que la subasta ha terminado
         item_.status = False

@@ -17,7 +17,7 @@
                     <!-- Ensure the correct ID is passed to the URL -->
                     <a href="{% url 'auctions:listing_details' item.0.id %}" class="text-decoration-none">
                         <div class="card h-100" style="background-color: black;">
-                            <img class="card-img-top" src="{{ item.0.img_url }}" alt="Card image cap">
+                            <img class="card-img-top" src="{% if item.0.image %}{{ item.0.image.url }}{% else %}{% static 'default-image.jpg' %}{% endif %}" alt="Card image cap">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">
                                     <span class="text-truncate" title="{{ item.0.title }}" style="color: white;">

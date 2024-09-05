@@ -7,90 +7,106 @@
     <div class="row justify-content-md-center">
         <div class="col-lg-10">
             <div class="card">
-                <!-- Card image -->
-                <img class="card-img-top" height="600px" src="{{item.img_url}}" alt="Item Image">
+                <div class="row no-gutters">
+                    <!-- Left Column: Image -->
+                    <div class="col-md-6">
+                        {% if item.image %}
+                            <img class="card-img" src="{{ item.image.url }}" alt="Item Image" style="height: 100%; width: 100%; object-fit: cover;">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Right Column: Information -->
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <!-- Item Title and Owner -->
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Organizacion: {{ owner.username }}</h6>
+                            
+                            <!-- Item Description -->
+                            <div style="height: 60px; overflow: auto;">
+                                <p class="card-text">{{ item.description }}</p>
+                            </div>
+                            
+                            <!-- Bid Information -->
+                            <div class="d-flex align-items-center mb-3">
+                              <label class="font-weight-bold mr-2">Ultima Oferta:</label>
+                              <span class="h3">
+                                  {% if last_bid %}
+                                      ${{ last_bid.amount }}
+                                  {% else %}
+                                      ${{ item.starting_bid }}
+                                  {% endif %}
+                              </span>
+                            </div>
+          
+                            <!-- Additional Bid Buttons -->
+                            <div class="mt-3">
+                              <button type="button" class="btn btn-secondary mr-2" onclick="updateBidAmount(1000)">+1000</button>
+                              <button type="button" class="btn btn-secondary" onclick="updateBidAmount(5000)">+5000</button>
+                            </div>
+                            <script>
+                                function updateBidAmount(amount) {
+                                    var bidInput = document.getElementById('bidAmount');
+                                    var currentBid = parseFloat(bidInput.value) || 0;
+                                    var newBid = currentBid + amount;
+                                    bidInput.value = newBid;
+                                    // Automatically submit the form with the new bid amount
+                                    document.getElementById('bidForm').submit();
+                                }
+                            </script>
+          
+                            <!-- Bid Form with Hidden Bid Amount Input -->
+                            <form method="POST" action="{% url 'auctions:place_bid' %}" id="bidForm">
+                                {% csrf_token %}
+                                <input type="hidden" id="bidAmount" name="new_bid" value="{% if last_bid %}{{ last_bid.amount }}{% else %}{{ item.starting_bid }}{% endif %}">
+                                <input type="hidden" name="listing_title" value="{{ item.title }}">
+                                <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Añadir ID del ítem -->
+                            </form>
+          
+                            <!-- Status Indicator -->
+                            <div class="d-flex align-items-center mb-3">
+                              <label class="font-weight-bold mr-2">Estado:</label>
+                              <div class="status-indicator" 
+                                  style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid; background-color: 
+                                  {% if item.status %}
+                                      green
+                                  {% else %}
+                                      red
+                                  {% endif %}; opacity: 0.4;">
+                              </div>
+                            </div>
+          
+                            <!-- End Listing Button -->
+                            {% if privilege %}
+                            <form action="{% url 'auctions:end_listing' %}" method="POST" class="mt-3">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <button type="submit" class="btn btn-warning">Cerrar Subasta</button>
+                            </form>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Bids Section -->
                 <div class="card-body">
-                    <!-- Item Title and Owner -->
-                    <h5 class="card-title">{{item.title}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Organizacion: {{owner.username}}</h6>
-                    
-                    <!-- Item Description -->
-                    <div style="height: 60px; overflow: auto;">
-                        <p class="card-text">{{item.description}}</p>
-                    </div>
-                    
-                    <!-- Bid Information -->
-                    <div class="d-flex align-items-center mb-3">
-                      <label class="font-weight-bold mr-2">Ultima Oferta:</label>
-                      <span class="h3">
-                          {% if last_bid %}
-                              ${{ last_bid }}
-                          {% else %}
-                              ${{ item.starting_bid }}
-                          {% endif %}
-                      </span>
-                    </div>
-  
-                    <!-- Additional Bid Buttons -->
-                    <div class="mt-3">
-                      <button type="button" class="btn btn-secondary mr-2" onclick="updateBidAmount(1000)">+1000</button>
-                      <button type="button" class="btn btn-secondary" onclick="updateBidAmount(5000)">+5000</button>
-                    </div>
-  
-                    <!-- Bid Form with Hidden Bid Amount Input -->
-                    <form method="POST" action="{% url 'auctions:place_bid' %}" id="bidForm">
-                        {% csrf_token %}
-                        <input type="hidden" id="bidAmount" name="new_bid" value="{% if last_bid %}{{ last_bid }}{% else %}{{ item.starting_bid }}{% endif %}">
-                        <input type="hidden" name="listing_title" value="{{ item.title }}">
-                        <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Añadir ID del ítem -->
-                    </form>
-  
-                    <!-- JavaScript to Update Bid Amount -->
-                    <script>
-                    function updateBidAmount(amount) {
-                      var bidInput = document.getElementById('bidAmount');
-                      var currentBid = parseFloat(bidInput.value) || 0;
-                      var newBid = currentBid + amount;
-                      bidInput.value = newBid;
-                      
-                      // Automatically submit the form with the new bid amount
-                      document.getElementById('bidForm').submit();
-                    }
-                    </script>
-  
-                    <!-- Status Indicator -->
-                    <div class="d-flex align-items-center mb-3">
-                      <label class="font-weight-bold mr-2">Estado:</label>
-                      <div class="status-indicator" 
-                          style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid; background-color: 
-                          {% if item.status %}
-                              green
-                          {% else %}
-                              red
-                          {% endif %}; opacity: 0.4;">
-                      </div>
-                    </div>
-  
-                    <!-- End Listing Button -->
-                    {% if privilege %}
-                        <form action="{% url 'auctions:end_listing' %}" method="POST" class="mt-3">
-                            {% csrf_token %}
-                            <input type="hidden" name="listing_title" value="{{item.title}}">
-                            <button type="submit" class="btn btn-warning">Cerrar Subasta</button>
-                        </form>
-                    {% endif %}
-
-                  <!-- Bid Form with Hidden Bid Amount Input -->
-                  <form method="POST" action="{% url 'auctions:place_bid' %}" id="bidForm" class="d-none">
-                      {% csrf_token %}
-                      <input type="hidden" id="bidAmount" name="new_bid" value="{% if last_bid %}{{ last_bid }}{% else %}{{ item.starting_bid }}{% endif %}">
-                      <input type="hidden" name="listing_title" value="{{item.title}}">
-                  </form>
-
-              </div>
-          </div>
-      </div>
-  </div>
+                    <h5 class="card-title">Últimas Ofertas</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for bid in recent_bids %}
+                            <li class="list-group-item">
+                                {{ bid.user.username }} - ${{ bid.amount }}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No hay ofertas aún.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

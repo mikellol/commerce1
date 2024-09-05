@@ -1,5 +1,6 @@
 from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 app_name = "auctions"
@@ -22,3 +23,6 @@ urlpatterns = [
     path("auctions_history", views.auctions_history, name="auctions_history"),
     path("delete_item_watchlist", views.delete_item_watchlist, name="delete_item_watchlist")
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
