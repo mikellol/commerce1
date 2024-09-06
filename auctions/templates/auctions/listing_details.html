@@ -8,44 +8,52 @@
         <div class="col-lg-10">
             <div class="card">
                 <div class="row no-gutters">
-                    <!-- Left Column: Image -->
+                    <!-- Columna izquierda: Imagen -->
                     <div class="col-md-6">
                         {% if item.image %}
                             <img class="card-img" src="{{ item.image.url }}" alt="Item Image" style="height: 100%; width: 100%; object-fit: cover;">
                         {% else %}
-                            <p>No image available</p>
+                            <p class="text-center">No image available</p>
                         {% endif %}
                     </div>
 
-                    <!-- Right Column: Information -->
+                    <!-- Columna derecha: Información -->
                     <div class="col-md-6">
                         <div class="card-body">
-                            <!-- Item Title and Owner -->
-                            <h5 class="card-title">{{ item.title }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Organizacion: {{ owner.username }}</h6>
-                            
-                            <!-- Item Description -->
-                            <div style="height: 60px; overflow: auto;">
-                                <p class="card-text">{{ item.description }}</p>
+                           
+                            <div style="margin-right: 20px;">
+                                <label class="font-weight-bold" style="color: black;">Lote:</label>
+                                <span class="card-title font-weight-bold" title="{{ item.0.title }}" style="color: black;">
+                                    {{ item.title }}
+                                </span>
                             </div>
-                            
-                            <!-- Bid Information -->
+                        
+                            <div>
+                                <label class="font-weight-bold" style="color: black;">Nombre:</label>
+                                <span class="card-text text-truncate" title="{{ item.0.description }}" style="color: black;">
+                                    {{ item.description }}
+                                </span>
+                            </div>
+
+                            <!-- Información de la oferta -->
                             <div class="d-flex align-items-center mb-3">
-                              <label class="font-weight-bold mr-2">Ultima Oferta:</label>
-                              <span class="h3">
-                                  {% if last_bid %}
-                                      ${{ last_bid.amount }}
-                                  {% else %}
-                                      ${{ item.starting_bid }}
-                                  {% endif %}
-                              </span>
+                                <label class="font-weight-bold mr-2" style="color: black;">Oferta:</label>
+                                <span class="h3" 
+                                      style="color: {% if last_bid %} rgb(228, 30, 30) {% else %} black {% endif %};">
+                                    {% if last_bid %}
+                                        ${{ last_bid.amount }}
+                                    {% else %}
+                                        ${{ item.starting_bid }}
+                                    {% endif %}
+                                </span>
                             </div>
-          
-                            <!-- Additional Bid Buttons -->
+
+                            <!-- Botones de oferta adicionales -->
                             <div class="mt-3">
-                              <button type="button" class="btn btn-secondary mr-2" onclick="updateBidAmount(1000)">+1000</button>
-                              <button type="button" class="btn btn-secondary" onclick="updateBidAmount(5000)">+5000</button>
+                                <button type="button" class="btn btn-secondary mr-2" onclick="updateBidAmount(1000)">+1000</button>
+                                <button type="button" class="btn btn-secondary" onclick="updateBidAmount(5000)">+5000</button>
                             </div>
+
                             <script>
                                 function updateBidAmount(amount) {
                                     var bidInput = document.getElementById('bidAmount');
@@ -56,29 +64,16 @@
                                     document.getElementById('bidForm').submit();
                                 }
                             </script>
-          
-                            <!-- Bid Form with Hidden Bid Amount Input -->
-                            <form method="POST" action="{% url 'auctions:place_bid' %}" id="bidForm">
+
+                            <!-- Formulario de oferta -->
+                            <form method="POST" action="{% url 'auctions:place_bid' %}" id="bidForm" class="mt-3">
                                 {% csrf_token %}
                                 <input type="hidden" id="bidAmount" name="new_bid" value="{% if last_bid %}{{ last_bid.amount }}{% else %}{{ item.starting_bid }}{% endif %}">
                                 <input type="hidden" name="listing_title" value="{{ item.title }}">
                                 <input type="hidden" name="item_id" value="{{ item.id }}"> <!-- Añadir ID del ítem -->
                             </form>
-          
-                            <!-- Status Indicator -->
-                            <div class="d-flex align-items-center mb-3">
-                              <label class="font-weight-bold mr-2">Estado:</label>
-                              <div class="status-indicator" 
-                                  style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid; background-color: 
-                                  {% if item.status %}
-                                      green
-                                  {% else %}
-                                      red
-                                  {% endif %}; opacity: 0.4;">
-                              </div>
-                            </div>
-          
-                            <!-- End Listing Button -->
+
+                            <!-- Botón para cerrar la subasta (si aplica) -->
                             {% if privilege %}
                             <form action="{% url 'auctions:end_listing' %}" method="POST" class="mt-3">
                                 {% csrf_token %}
@@ -87,26 +82,28 @@
                             </form>
                             {% endif %}
 
+                            <!-- Sección de ofertas recientes -->
+                            <div class="mt-4">
+                                <h6 class="font-weight-bold">Ofertas recientes:</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for bid in recent_bids %}
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>{{ bid.user.username|slice:":3" }}***</span>
+                                            <span class="font-weight-bold">${{ bid.amount }}</span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item text-center">No hay ofertas aún.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-                
-                <!-- Recent Bids Section -->
-                <div class="card-body">
-                    <h5 class="card-title">Últimas Ofertas</h5>
-                    <ul class="list-group list-group-flush">
-                        {% for bid in recent_bids %}
-                            <li class="list-group-item">
-                                {{ bid.user.username }} - ${{ bid.amount }}
-                            </li>
-                        {% empty %}
-                            <li class="list-group-item">No hay ofertas aún.</li>
-                        {% endfor %}
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 {% endblock %}

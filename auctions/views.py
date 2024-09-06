@@ -30,16 +30,16 @@ class ItemForm(forms.ModelForm):
         model = Item
         fields = ['title', 'description', 'image', 'starting_bid']
         labels = {
-            'title': 'Nombre',
-            'description': 'Descripción',
+            'title': 'Lote',
+            'description': 'Nombre',
             'image': 'Imagen',
             'starting_bid': 'Precio'
         }
         widgets = {
-        'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Title'}),
-        'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description'}),
-        'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'item_img_url', 'placeholder': 'Image'}),
-        'starting_bid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Starting Bid'})
+        'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lote'}),
+        'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
+        'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'item_img_url'}),
+        'starting_bid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio inicial'})
         }
 
 class Comment(models.Model):
@@ -108,6 +108,7 @@ def index(request):
         "json_users": json_users,
         "commentForm": CommentForm(),
         "message": message,
+        'is_index': True
     }
     
     return render(request, "auctions/index.html", context)

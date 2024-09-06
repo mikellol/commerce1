@@ -12,48 +12,55 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    
 </head>
 <body class="bg-light text-dark">
     <div class="wrapper">
         <!-- Header Section -->
-        <header class="py-4 mb-4 border-bottom">
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-2">
-                <div class="container">
-                    <a class="navbar-brand font-weight-bold" href="{% url 'auctions:index' %}">Subasta UGRCH</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="{% url 'auctions:index' %}">Ejemplares</a>
-                            </li>
-                            {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Ejemplar</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-
-                        <!-- Login/Register Section -->
-                        <ul class="navbar-nav ml-auto">
-                            {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <span class="navbar-text text-muted">Signed in as <strong>{{ user.username }}</strong>.</span>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'auctions:logout' %}" class="btn btn-outline-dark ml-3">Cerrar sesión</a>
-                            </li>
-                            {% else %}
-                            <li class="nav-item">
-                                <a href="{% url 'auctions:login' %}" class="btn btn-dark">Sesión</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-2">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'auctions:index' %}">
+                <!-- Logo Image -->
+                <img src="{% static 'images/Logo-UGRCH.png' %}" alt="Logo" style="height: 30px;">
+                <!-- Page Name -->
+                <span class="font-weight-bold">Subasta UGRCH</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Navigation Links -->
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'auctions:index' %}">Lotes</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Lote</a>
+                    </li>
+                    {% endif %}
+                </ul>
+        
+                <!-- Login/Register Section -->
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a href="{% url 'auctions:logout' %}" class="btn btn-outline-dark ml-3">Cerrar sesión</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'auctions:login' %}" class="btn btn-dark">Sesión</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+        
+        {% if is_index %}
+        <!-- Header Image -->
+        <div class="header-image">
+            <img src="{% static 'images/default-header.jpg' %}" alt="Header Image" class="w-100">
+        </div>
+        {% endif %}
 
         <!-- Main Content -->
         <div class="container content py-4">

@@ -22,7 +22,8 @@ urlpatterns = [
     path("end_listing", views.end_listing, name="end_listing"),
     path("auctions_history", views.auctions_history, name="auctions_history"),
     path("delete_item_watchlist", views.delete_item_watchlist, name="delete_item_watchlist")
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+# Add this at the end of your urlpatterns list
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

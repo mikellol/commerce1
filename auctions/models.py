@@ -11,8 +11,8 @@ class Item(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="item_list")
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256, blank=True)
-    image = models.ImageField(upload_to='imagenes_raza/', blank=True, default='path/to/default-image.jpg')
-    starting_bid = models.DecimalField(max_digits=10, decimal_places=2,)
+    image = models.ImageField(upload_to='imagenes_raza/', blank=True, default='default-image.jpg')
+    starting_bid = models.IntegerField()
     status = models.BooleanField(default=True)
 
     def __str__(self):
