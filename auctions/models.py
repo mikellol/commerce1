@@ -14,6 +14,7 @@ class Item(models.Model):
     image = models.ImageField(upload_to='imagenes_raza/', blank=True, default='default-image.jpg')
     starting_bid = models.IntegerField()
     status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)  # Automatically set the field to now when the object is first created
 
     def __str__(self):
         return f"{self.title}, {self.description}"

@@ -2,12 +2,7 @@
 {% load static %}
 
 
-{% block body %}
-
-    {%if message %}
-                          <p>{{message}}</p>
-                          {%endif%}
-                          
+{% block body %}                
     {% if items %}
     <div class="container">
         <div class="row">
@@ -34,7 +29,6 @@
                                         </div>
                                     </div>
                                     
-                                
                                     <div class="d-flex ">
                                         
                                         <label class="font-weight-bold" style="color: black;">Oferta: </label>
@@ -57,86 +51,10 @@
     
 {% else %}
     <div class="container text-center mt-4">
-        <h4>There's no listing at the moment</h4>
+        <h4>No hay lotes</h4>
     </div>
 {% endif %}
                       
-
-    <!-- The Modal -->
-    <div class="modal" id="myModal">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-          <div class="modal-content">
-      
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <div style="width: 100%; box-sizing: border-box;">
-                    <div class="box">
-                        <img id="img_item_modal" height="220px"  src="" alt="Card image cap">
-                    </div>
-
-                    <h4 id="modal_title" class="modal-title">{{item.0.title}}</h4>
-                    <div style="display: inline-block; position: relative;">
-                       <label >Owner: </label> 
-                       <label id="username_label">{{user.username}}</label>
-                    </div>
-                    <div style="">
-                        <label >Current Bid: $</label> 
-                        <label id="modal_bid"></label>
-                    </div>
-                </div>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <!-- Modal body -->
-            <div class="modal-body">
-              <h5>Comments</h5>
-             <div class="media-list">
-                 <li class="media">
-                     <a class="pull-left" href="#">
-                        <img class="media-object rounded-circle" height="150px" src="{% static 'auctions/media/alejo_cat.jpeg'%}" alt="profile">
-                     </a>
-                     <div style="background-color: #E2E2E2; " class="media-body">
-                         <div style="padding: 20px; " class="well well-lg">
-                             <h4 id="" class="media-heading text-uppercase reviews">{{user.username}}</h4>
-                             
-                             <ul class="media-date text-uppercase reviews ">
-                                <li>22</li>
-                                <li>09</li>
-                                <li>2014</li>
-                             </ul>
-                             <p class="media-comment">
-                                Great job Alejo, Keep it up!
-                             </p>
-                             
-                         </div>
-                     </div>
-                 </li>
-             </div>
-             
-             <form method="POST" action="{% url 'auctions:add_comment' %}">
-                <div class="form-group">
-                    {% csrf_token %}
-                    <label for="textAreaComment">New comment</label>
-                    <input hidden  type="text" id="uname" name="username" value="{{user.username}}" > 
-                    <!-- <textarea class="form-control" id="comment" rows="2" placeholder="Type a comment">USER</textarea> -->
-                    <textarea class="form-control" rows="2" placeholder="Type a comment" id="comment", name="comment" value="USER"> </textarea>
-                    <!-- {{commentForm}} -->
-                    <div style="text-align: right;">
-                    <button  id="addComment" type="submit" class="btn btn-secondary" >Comment</button>
-                     </div>
-                  </div> 
-             </form>
-             
-                                         
-            </div>
-             <!-- Modal footer -->
-             <div class="modal-footer">
-                <button id="closeModalBtn" type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-    </div>
-    
     <script type="text/javascript">
     var data = {{json|safe}}
     var users = {{json_users|safe}}

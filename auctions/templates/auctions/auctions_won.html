@@ -2,45 +2,46 @@
 {% load static %}
 
 {% block body %}
-{% if message %}
-<p>{{message}}</p>
-{% endif %}
 
-{% if items %}
+{% if items_bids %}
 <div class="container">
     <div class="row">
-      <iframe src="https://giphy.com/embed/9xt1MUZqkneFiWrAAD" width="240" height="240" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/winner-good-job-trophy-9xt1MUZqkneFiWrAAD"></a></p>
-{% for item in items_bids %}
-        <div class="col-lg-4">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top"   src="{{item.0.img_url}}" alt="Card image cap">
-                <div class="card-body">
-                  <h5 class="card-title">
-                      <span style="display: block; overflow: hidden; white-space: nowrap; height: 23px; text-overflow: ellipsis;">
-                        {{item.0.title}}
-                      </span>
-                      </h5>
-                  <h6 class="card-subtitle mb-2 text-muted">{{ item.0.user.username }}</h6>
-                    <p class="card-text">
-                        <span id="item-title" style="display: block; overflow: hidden; white-space: nowrap; height: 23px; text-overflow: ellipsis;">
-                           {{item.0.description}}
-                        </span>
-                    </p>
+        {% for item, bid in items_bids %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+                {% if item.image %}
+                    <img class="card-img-top" src="{{ item.image.url }}" alt="Card image cap">
+                {% else %}
+                    <img class="card-img-top" src="{% static 'images/default-image.jpg' %}" alt="Default image">
+                {% endif %}
+                <div class="card-body p-2">
+                  <div >
+                      <div style="margin-right: 20px;">
+                          <label class="font-weight-bold" style="color: black;">Lote:</label>
+                          <span class="font-weight-bold" title="{{ item.0.title }}" style="color: black;">
+                              {{ item.title }}
+                          </span>
+                      </div>
                   
-                  <div style="flex-direction: row; " class="flexbox-container">
-                    <label style="font-size: 20px; font-weight: bold; padding-right: 10px;">Bid</label>
-                    <label style="font-size: 35px; ">${{item.1.amount}}</label>
+                      <div>
+                          <label class="font-weight-bold" style="color: black;">Nombre:</label>
+                          <span class="card-text text-truncate" title="{{ item.0.description }}" style="color: black;">
+                              {{ item.description }}
+                          </span>
+                      </div>
                   </div>
-                </div>
+                  <div class="d-flex ">
+                      <label class="font-weight-bold" style="color: black;">Oferta: </label>
+                      <span class="font-weight-bold" style="color: rgb(228, 30, 30);">${% if bid %} {{ bid.amount }} {% else %} 0 {% endif %}</span>
+                  </div>
+              </div>
             </div>
         </div>
-{% endfor %}
-
+        {% endfor %}
+    </div>
 </div>
-</div> 
 {% else %}
-  <h4>No auctions</h4>
+<h4>No has subastado</h4>
 {% endif %}
 
-
-{% endblock  %}
+{% endblock %}

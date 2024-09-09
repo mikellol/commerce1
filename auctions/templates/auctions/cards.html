@@ -37,42 +37,5 @@
             </div>
         </div>
     </div>
-    
-    <!-- The Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{ item.title }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <img class="img-fluid" src="{{ item.img_url }}" alt="Item Image">
-                    <p>{{ item.description }}</p>
-                    <div class="media">
-                        <img class="mr-3 rounded-circle" src="{% static 'auctions/media/alejo_cat.jpeg' %}" alt="Profile image" height="64">
-                        <div class="media-body">
-                            <h5 class="mt-0">{{ user.username }}</h5>
-                            <!-- Additional content, e.g., comments -->
-                            <div class="form-group">
-                                <label for="newComment">New comment</label>
-                                <textarea class="form-control" id="newComment" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <!-- Additional footer actions if needed -->
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>

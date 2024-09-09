@@ -20,7 +20,7 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-2">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'auctions:index' %}">
                 <!-- Logo Image -->
-                <img src="{% static 'images/Logo-UGRCH.png' %}" alt="Logo" style="height: 30px;">
+                <img src="{% static 'images/Logo-UGRCH.png' %}" alt="Logo" style="height: 50px;">
                 <!-- Page Name -->
                 <span class="font-weight-bold">Subasta UGRCH</span>
             </a>
@@ -34,9 +34,17 @@
                         <a class="nav-link text-dark" href="{% url 'auctions:index' %}">Lotes</a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Lote</a>
-                    </li>
+                        {% if user.is_staff %}
+                            <!-- Link visible only to staff members -->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Lote</a>
+                            </li>
+                        {% else %}
+                            <!-- Link visible only to authenticated users but not staff -->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:auctions_history' %}">Mis subastas</a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
         
@@ -44,11 +52,11 @@
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="{% url 'auctions:logout' %}" class="btn btn-outline-dark ml-3">Cerrar sesión</a>
+                        <a href="{% url 'auctions:logout' %}" class="btn btn-dark">Cerrar sesión</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a href="{% url 'auctions:login' %}" class="btn btn-dark">Sesión</a>
+                        <a href="{% url 'auctions:login' %}" class="btn btn-dark">iniciar sesión</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -58,7 +66,7 @@
         {% if is_index %}
         <!-- Header Image -->
         <div class="header-image">
-            <img src="{% static 'images/default-header.jpg' %}" alt="Header Image" class="w-100">
+            <img src="{% static 'images/Header.png' %}" alt="Header Image" class="w-100">
         </div>
         {% endif %}
 
