@@ -13,7 +13,8 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from .models import Item, ItemCategory
 import logging
-import os  
+import os  # Make sure to import the os module
+
 from .models import User, Bid, Item, ItemComment, Watchlist, ItemCategory, AuctionHistory
 from .utils import utility
 import json 
@@ -137,29 +138,38 @@ def logout_view(request):
 
 def register(request):
     if request.method == "POST":
-        commentForm = CommentForm(request.POST)
-        # if commentForm.is_valid():
-            #logger.infor(commentForm)
+        # Retrieve form data
+        username = request.POST.get("username")  # Make sure the username is captured
+        email = request.POST.get("email")
+        phone_number = request.POST.get("phone_number")  # Capture phone number
+        password = request.POST.get("password")
+        confirmation = request.POST.get("confirmation")
+
+        # Ensure all fields are filled in
+        if not username:
+            return render(request, "auctions/register.html", {
+                "message": "Username is required."
+            })
 
         # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
         if password != confirmation:
             return render(request, "auctions/register.html", {
                 "message": "Passwords must match."
             })
-        username=request.POST["username"]
-        email=request.POST["email"]
+
         # Attempt to create new user
         try:
-            user = User.objects.create_user(username, email, password)
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.phone_number = phone_number  # Save phone number (if user model has this field)
             user.save()
+
+            # Log in the user after successful registration
+            login(request, user)
+            return HttpResponseRedirect(reverse("auctions:index"))
         except IntegrityError:
             return render(request, "auctions/register.html", {
                 "message": "Username already taken."
             })
-        login(request, user)
-        return HttpResponseRedirect(reverse("auctions:index"))
     else:
         return render(request, "auctions/register.html")
 
@@ -297,6 +307,7 @@ def listing_details_view(request, id=None):
 
 @login_required
 def add_comment(request):
+    #Verify and recover the text
     if request.method == 'POST':
         #Get important things: username, commented item title, and user making the comment
         item_name = request.POST.get('listing_title')
@@ -451,37 +462,25 @@ def end_listing(request):
     return HttpResponseRedirect(reverse('auctions:index'))
 
 def auctions_history(request):
-    user = request.user
-    
-    # Filtra el historial de subastas para el usuario autenticado
-    auction_history = AuctionHistory.objects.filter(user=user)
-    
+    user_ = User.objects.filter(username=request.user.username).get()
+    auction_history = AuctionHistory.objects.filter(user=user_)
     items = []
     bids = []
-    
-    if auction_history.exists():
-        message = ""
+    if len(auction_history)!=0:
+        message=""
         for auction_item in auction_history:
-            # Filtrar correctamente por 'items', que es la clave foránea en Bid
-            bid_item = Bid.objects.filter(items=auction_item.items, user=user).order_by('-created_at').first()
-            
-            # Si hay una oferta, añádela a la lista de ofertas
-            if bid_item:
-                bids.append(bid_item)
-                items.append(auction_item.items)
-        
-        # Empareja artículos con sus ofertas correspondientes
-        items_bids = list(zip(items, bids))
-        
-        # Ordena por la fecha de creación de las ofertas, de más reciente a más antigua
-        items_bids.sort(key=lambda x: x[1].created_at, reverse=True)
-        
-        return render(request, "auctions/auctions_won.html", {
-            "items_bids": items_bids,
-            "message": message
-        })
+            bid_item = Bid.objects.filter(items=auction_item.items, user=user_).order_by('amount').last()
+            bids.append(bid_item)
+            items.append(auction_item.items)
+        items_bids =list(zip(items, bids))
+        return render(request, "auctions/auctions_won.html",{
+        "items":items,
+        "items_bids": items_bids,
+        "message": message
+    })
     else:
-        message = "You have not won any auction yet."
-        return render(request, "auctions/auctions_won.html", {
-            "message": message
-        })
+        message="You have not won any auction yet."
+        return render(request, "auctions/auctions_won.html",{
+        "message": message
+    })
+    

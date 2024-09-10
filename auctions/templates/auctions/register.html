@@ -11,18 +11,21 @@
     <form action="{% url 'auctions:register' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
-            <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+            <input class="form-control" type="text" name="username" placeholder="Nombre de usuario" required>
         </div>
         <div class="form-group">
-            <input class="form-control" type="email" name="email" placeholder="Email Address">
+            <input class="form-control" type="email" name="email" placeholder="Email" required>
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
+            <input class="form-control" type="number" name="phone_number" placeholder="Numero telefonico" required>
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+            <input class="form-control" type="password" name="password" placeholder="Contraseña" required>
         </div>
-        <input class="btn btn-primary" type="submit" value="Register">
+        <div class="form-group">
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirmacion de contraseña" required>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Regístrate">
     </form>
 
     Ya tienes una cuenta? <a href="{% url 'auctions:login' %}">Iniciar sesión.</a>

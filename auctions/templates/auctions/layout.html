@@ -39,6 +39,10 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" href="{% url 'auctions:add' %}">Agregar Lote</a>
                             </li>
+                            <!-- Link visible only to authenticated users but not staff -->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{% url 'auctions:auctions_history' %}">Subastas</a>
+                            </li>
                         {% else %}
                             <!-- Link visible only to authenticated users but not staff -->
                             <li class="nav-item">

@@ -16,6 +16,7 @@ class Item(models.Model):
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically set the field to now when the object is first created
 
+
     def __str__(self):
         return f"{self.title}, {self.description}"
 

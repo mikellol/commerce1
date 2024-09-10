@@ -77,9 +77,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'auction',  # Nombre de la base de datos
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',  # O la IP del servidor MySQL
+        'USER': 'miguel',
+        'PASSWORD': 'Miguel741**',
+        'HOST': '40.74.208.61',  # O la IP del servidor MySQL
         'PORT': '3306',  # Puerto MySQL (el valor por defecto es 3306)
     }
 }
