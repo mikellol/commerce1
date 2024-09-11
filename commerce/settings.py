@@ -24,7 +24,7 @@ SECRET_KEY = '6ps8j!crjgrxt34cqbqn7x&b3y%(fny8k8nh21+qa)%ws3fh!q'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['subastasugrch.com', 'www.subastasugrch.com']
 
 
 # Application definition
@@ -76,10 +76,10 @@ WSGI_APPLICATION = 'commerce.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'auction',  # Nombre de la base de datos
-        'USER': 'miguel',
-        'PASSWORD': 'Miguel741**',
-        'HOST': '40.74.208.61',  # O la IP del servidor MySQL
+        'NAME': 'auctions',  # Nombre de la base de datos
+        'USER': 'root',
+        'PASSWORD': 'tu_contraseña_segura',
+        'HOST': 'localhost',  # O la IP del servidor MySQL
         'PORT': '3306',  # Puerto MySQL (el valor por defecto es 3306)
     }
 }
@@ -130,21 +130,17 @@ USE_TZ = True
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'filters': ['require_debug_true'],
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/usr/local/lsws/Example/html/commerce/debug.log',
         },
     },
     'loggers': {
-        'mylogger': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
