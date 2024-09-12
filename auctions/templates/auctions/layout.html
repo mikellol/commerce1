@@ -5,7 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Auctions{% endblock %}</title>
+    <title>{% block title %}Subastas UGRCH{% endblock %}</title>
+
+<!-- Favicon -->
+    <link rel="icon" href="{% static 'images/Logo-UGRCH.png' %}" type="image/x-icon">
+    
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     <link href="{% static 'auctions/cards.css' %}" rel="stylesheet">
@@ -48,31 +53,21 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" href="{% url 'auctions:auctions_history' %}">Mis subastas</a>
                             </li>
+        	            <li class="nav-item">
+	                        <a class="nav-link" href="{% url 'auctions:profile' %}">Mi Perfil</a> <!-- Profile link -->
+                	    </li>
+
                         {% endif %}
                     {% endif %}
                 </ul>
         
                 <!-- Login/Register Section -->
                 <ul class="navbar-nav ml-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a href="{% url 'auctions:logout' %}" class="btn btn-dark">Cerrar sesión</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a href="{% url 'auctions:login' %}" class="btn btn-dark">iniciar sesión</a>
-                    </li>
-                    {% endif %}
+
                 </ul>
             </div>
         </nav>
         
-        {% if is_index %}
-        <!-- Header Image -->
-        <div class="header-image">
-            <img src="{% static 'images/Header.png' %}" alt="Header Image" class="w-100">
-        </div>
-        {% endif %}
 
         <!-- Main Content -->
         <div class="container content py-4">

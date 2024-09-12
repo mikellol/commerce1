@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<div class="container">
+    <h2>Perfil del Usuario</h2>
+    <p><strong>Nombre de Usuario:</strong> {{ user.username }}</p>
+    <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+    <p><strong>Teléfono:</strong> {{ user.phone_number }}</p>
+
+    <h3>Cambiar Contraseña</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+    </form>
+
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
